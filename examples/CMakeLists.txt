@@ -1,3 +1,4 @@
 add_subdirectory(helloworld)
 add_subdirectory(sierpinski)
+add_subdirectory(asteroids)
 
