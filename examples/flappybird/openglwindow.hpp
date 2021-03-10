@@ -6,6 +6,7 @@
 #include <random>
 
 #include "abcg.hpp"
+#include "bird.hpp"
 #include "pipes.hpp"
 
 class OpenGLWindow : public abcg::OpenGLWindow {
@@ -25,6 +26,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
   GameData m_gameData;
 
+  Bird m_bird;
   Pipes m_pipes;
 
   abcg::ElapsedTimer m_restartWaitTimer;

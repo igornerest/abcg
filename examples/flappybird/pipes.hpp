@@ -38,6 +38,8 @@ class Pipes {
     float m_pipeLeft{+0.0f};
     float m_pipeRight{+0.4f};
 
+    bool m_dead{false};
+
     glm::vec4 m_color{1};
     glm::vec2 m_translation{glm::vec2{+1.0f, +0.0f}};
   };
@@ -45,6 +47,8 @@ class Pipes {
   std::list<Pipe> m_pipes;
 
   std::default_random_engine m_randomEngine;
+
+  abcg::ElapsedTimer m_pipeCooldownTimer;
 
   Pipes::Pipe createPipe();
 };

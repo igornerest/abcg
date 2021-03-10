@@ -1,7 +1,7 @@
 #include "pipes.hpp"
 
 #include <cppitertools/itertools.hpp>
-
+#include <iostream>
 void Pipes::initializeGL(GLuint program) {
   terminateGL();
 
@@ -47,10 +47,23 @@ void Pipes::terminateGL() {
 }
 
 void Pipes::update(float deltaTime) {
+  // At least 250 ms must have passed to create new pipe
+  if (m_pipeCooldownTimer.elapsed() > 4000.0 / 1000.0) {
+    m_pipeCooldownTimer.restart();
+    m_pipes.push_back(createPipe());
+  }
+
   float birdVelocity{0.3f};
   for (auto &pipe : m_pipes) {
     pipe.m_translation.x -= birdVelocity * deltaTime;
+    
+    if (pipe.m_translation.x < -1.5f) {
+      pipe.m_dead = true;
+    }
   }
+
+  // Remove dead pipes
+  m_pipes.remove_if([](const Pipe &p) { return p.m_dead; });
 }
 
 Pipes::Pipe Pipes::createPipe() {

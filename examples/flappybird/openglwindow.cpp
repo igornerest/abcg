@@ -29,12 +29,14 @@ void OpenGLWindow::restart() {
   m_gameData.m_state = State::Playing;
 
   m_pipes.initializeGL(m_program);
+  m_bird.initializeGL(m_program);
 }
 
 void OpenGLWindow::update() {
   float deltaTime{static_cast<float>(getDeltaTime())};
 
   m_pipes.update(deltaTime);
+  m_bird.update(deltaTime);
 }
 
 void OpenGLWindow::paintGL() {
@@ -44,6 +46,7 @@ void OpenGLWindow::paintGL() {
   glViewport(0, 0, m_viewportWidth, m_viewportHeight);
 
   m_pipes.paintGL();
+  m_bird.paintGL();
 }
 
 void OpenGLWindow::paintUI() {
@@ -60,6 +63,7 @@ void OpenGLWindow::terminateGL() {
   glDeleteProgram(m_program);
 
   m_pipes.terminateGL();
+  m_bird.terminateGL();
 }
 
 void OpenGLWindow::checkCollisions() {
