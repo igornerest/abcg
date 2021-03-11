@@ -8,6 +8,7 @@
 #include "gamedata.hpp"
 
 class OpenGLWindow;
+class Pipes;
 
 class Bird {
  public:
@@ -15,10 +16,11 @@ class Bird {
   void paintGL();
   void terminateGL();
 
-  void update(float deltaTime);
+  void update(const GameData &gameData, float deltaTime);
 
  private:
   friend OpenGLWindow;
+  friend Pipes;
 
   GLuint m_program{};
   GLint m_pointSizeLoc{};
@@ -32,11 +34,15 @@ class Bird {
   glm::vec2 m_translation{0, 0};
   glm::vec2 m_birdLocation{0.0f, 0.0f};
 
+  float m_acceleration{0.0f};
   float m_birdRadius{0.1f};
   
   int m_defaultPolygonSides{40};
 
   std::default_random_engine m_randomEngine;
+
+  abcg::ElapsedTimer m_jumpCooldownTimer;
+  abcg::ElapsedTimer m_moveCooldownTimer;
 
   void setupModel(std::vector<glm::vec2> positions);
 };

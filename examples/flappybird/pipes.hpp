@@ -6,6 +6,7 @@
 
 #include "abcg.hpp"
 #include "gamedata.hpp"
+#include "bird.hpp"
 
 class OpenGLWindow;
 
@@ -15,7 +16,7 @@ class Pipes {
   void paintGL();
   void terminateGL();
 
-  void update(float deltaTime);
+  void update(const Bird &bird, float deltaTime);
 
  private:
   friend OpenGLWindow;
@@ -50,7 +51,7 @@ class Pipes {
 
   abcg::ElapsedTimer m_pipeCooldownTimer;
 
-  Pipes::Pipe createPipe();
+  Pipes::Pipe createPipe(const Bird &bird);
 };
 
 #endif

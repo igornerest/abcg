@@ -5,6 +5,25 @@
 #include "abcg.hpp"
 
 void OpenGLWindow::handleEvent(SDL_Event &event) {
+  // Keyboard events
+  if (event.type == SDL_KEYDOWN) {
+    if (event.key.keysym.sym == SDLK_SPACE)
+      m_gameData.m_shouldJump = true;
+  }
+  if (event.type == SDL_KEYUP) {
+    if (event.key.keysym.sym == SDLK_SPACE)
+      m_gameData.m_shouldJump = false;
+  }
+
+  // Mouse events
+  if (event.type == SDL_MOUSEBUTTONDOWN) {
+    if (event.button.button == SDL_BUTTON_LEFT)
+      m_gameData.m_shouldJump = true;
+  }
+  if (event.type == SDL_MOUSEBUTTONUP) {
+    if (event.button.button == SDL_BUTTON_LEFT)
+      m_gameData.m_shouldJump = false;
+  }
 }
 
 void OpenGLWindow::initializeGL() {
@@ -35,8 +54,8 @@ void OpenGLWindow::restart() {
 void OpenGLWindow::update() {
   float deltaTime{static_cast<float>(getDeltaTime())};
 
-  m_pipes.update(deltaTime);
-  m_bird.update(deltaTime);
+  m_bird.update(m_gameData, deltaTime);
+  m_pipes.update(m_bird, deltaTime);
 }
 
 void OpenGLWindow::paintGL() {

@@ -1,6 +1,7 @@
 #include "bird.hpp"
 
 #include <cppitertools/itertools.hpp>
+#include <algorithm> 
 
 void Bird::initializeGL(GLuint program) {
   terminateGL();
@@ -58,6 +59,7 @@ void Bird::paintGL() {
   glBindVertexArray(m_vao);
 
   glUniform4fv(m_colorLoc, 1, &m_color.r);
+  glUniform2f(m_translationLoc, m_translation.x, m_translation.y);
   // Draw a single point
   glDrawArrays(GL_TRIANGLE_FAN, 0, m_defaultPolygonSides);
   // End using VAO
@@ -71,5 +73,12 @@ void Bird::terminateGL() {
   glDeleteVertexArrays(1, &m_vao);
 }
 
-void Bird::update(float deltaTime) {
+void Bird::update(const GameData &gameData, float deltaTime) {
+  if (gameData.m_state == State::Playing) {
+      if (m_moveCooldownTimer.elapsed() > 10.0 / 1000.0) {
+        m_moveCooldownTimer.restart();
+        m_acceleration = gameData.m_shouldJump ? std::max(m_acceleration, 0.010f) : m_acceleration - 0.001;
+        m_translation.y += m_acceleration;
+    }
+  }
 }

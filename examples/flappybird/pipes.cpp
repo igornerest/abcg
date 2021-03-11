@@ -1,7 +1,7 @@
 #include "pipes.hpp"
 
 #include <cppitertools/itertools.hpp>
-#include <iostream>
+
 void Pipes::initializeGL(GLuint program) {
   terminateGL();
 
@@ -12,14 +12,6 @@ void Pipes::initializeGL(GLuint program) {
   m_program = program;
   m_colorLoc = glGetUniformLocation(m_program, "color");
   m_translationLoc = glGetUniformLocation(m_program, "translation");
-
-  // Create asteroids
-  m_pipes.clear();
-  m_pipes.resize(1);
-
-  for (auto &pipe : m_pipes) {
-    pipe = createPipe();
-  }
 }
 
 void Pipes::paintGL() {
@@ -46,11 +38,11 @@ void Pipes::terminateGL() {
   }
 }
 
-void Pipes::update(float deltaTime) {
+void Pipes::update(const Bird &bird, float deltaTime) {
   // At least 250 ms must have passed to create new pipe
   if (m_pipeCooldownTimer.elapsed() > 4000.0 / 1000.0) {
     m_pipeCooldownTimer.restart();
-    m_pipes.push_back(createPipe());
+    m_pipes.push_back(createPipe(bird));
   }
 
   float birdVelocity{0.3f};
@@ -66,10 +58,10 @@ void Pipes::update(float deltaTime) {
   m_pipes.remove_if([](const Pipe &p) { return p.m_dead; });
 }
 
-Pipes::Pipe Pipes::createPipe() {
+Pipes::Pipe Pipes::createPipe(const Bird &bird) {
   Pipe pipe;
   
-  float middleDistance{0.15f};
+  float middleDistance{3 * bird.m_birdRadius};
 
   auto &re{m_randomEngine};  
   std::uniform_real_distribution<float> randomMiddle{-0.9f + middleDistance, 0.9f - middleDistance};
