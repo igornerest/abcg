@@ -1,6 +1,7 @@
 #include "openglwindow.hpp"
 
 #include <imgui.h>
+#include <algorithm> 
 
 #include "abcg.hpp"
 
@@ -45,17 +46,27 @@ void OpenGLWindow::initializeGL() {
 }
 
 void OpenGLWindow::restart() {
-  m_gameData.m_state = State::Playing;
-
   m_pipes.initializeGL(m_program);
   m_bird.initializeGL(m_program);
+
+  m_gameData.m_state = State::Playing;
 }
 
 void OpenGLWindow::update() {
   float deltaTime{static_cast<float>(getDeltaTime())};
 
+  // Wait 5 seconds before restarting
+  if (m_gameData.m_state == State::GameOver && m_restartWaitTimer.elapsed() > 5) {
+    restart();
+    return;
+  }
+
   m_bird.update(m_gameData, deltaTime);
-  m_pipes.update(m_bird, deltaTime);
+  m_pipes.update(m_bird, m_gameData, deltaTime);
+
+  if (m_gameData.m_state == State::Playing) {
+    checkCollisions();
+  }
 }
 
 void OpenGLWindow::paintGL() {
@@ -86,4 +97,27 @@ void OpenGLWindow::terminateGL() {
 }
 
 void OpenGLWindow::checkCollisions() {
+  bool hasCollided{false};
+  bool hasFallen{false};
+
+  // check collision between bird and pipes
+  for (auto &pipe : m_pipes.m_pipes) {
+    if (std::abs(pipe.m_translation.x) < pipe.m_width/2 + m_bird.m_radius) {
+      if (m_bird.m_translation.y + m_bird.m_radius > pipe.m_upperPipeBottom || 
+          m_bird.m_translation.y - m_bird.m_radius < pipe.m_lowerPipeTop) {
+            hasCollided = true;
+            break;
+      }
+    }
+  }
+
+  // check if bird has fallen
+  if (std::abs(m_bird.m_translation.y) + m_bird.m_radius > 1.0f) {
+    hasFallen = true;
+  }
+
+  if (hasCollided || hasFallen) {
+    m_gameData.m_state = State::GameOver;
+    m_restartWaitTimer.restart();
+  }
 }

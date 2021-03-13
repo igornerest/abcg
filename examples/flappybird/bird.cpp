@@ -5,6 +5,7 @@
 
 void Bird::initializeGL(GLuint program) {
   terminateGL();
+  resetBird();
 
   m_program = program;
   m_pointSizeLoc = glGetUniformLocation(m_program, "pointSize");
@@ -19,7 +20,7 @@ void Bird::initializeGL(GLuint program) {
   float mounthAngle{M_PI/6};
   float step{(fullAngle - mounthAngle) / m_defaultPolygonSides};
   for (auto angle : iter::range(mounthAngle, fullAngle - mounthAngle, step)) {
-    positions.emplace_back(m_birdRadius * std::cos(angle), m_birdRadius * std::sin(angle));
+    positions.emplace_back(m_radius * std::cos(angle), m_radius * std::sin(angle));
   }
 
   setupModel(positions);
@@ -75,10 +76,15 @@ void Bird::terminateGL() {
 
 void Bird::update(const GameData &gameData, float deltaTime) {
   if (gameData.m_state == State::Playing) {
-      if (m_moveCooldownTimer.elapsed() > 10.0 / 1000.0) {
+    if (m_moveCooldownTimer.elapsed() > 10.0 / 1000.0) {
         m_moveCooldownTimer.restart();
         m_acceleration = gameData.m_shouldJump ? std::max(m_acceleration, 0.010f) : m_acceleration - 0.001;
         m_translation.y += m_acceleration;
     }
   }
+}
+
+void Bird::resetBird() {
+  m_translation = glm::vec2{0, 0};
+  m_acceleration = 0;
 }

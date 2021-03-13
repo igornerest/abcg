@@ -16,7 +16,7 @@ class Pipes {
   void paintGL();
   void terminateGL();
 
-  void update(const Bird &bird, float deltaTime);
+  void update(const Bird &bird, const GameData &gameData, float deltaTime);
 
  private:
   friend OpenGLWindow;
@@ -36,13 +36,12 @@ class Pipes {
     float m_lowerPipeTop;
     float m_lowerPipeBottom{-1.0f};
 
-    float m_pipeLeft{+0.0f};
-    float m_pipeRight{+0.4f};
+    float m_width{0.4f};
 
     bool m_dead{false};
 
     glm::vec4 m_color{1};
-    glm::vec2 m_translation{glm::vec2{+1.0f, +0.0f}};
+    glm::vec2 m_translation{glm::vec2{+1.0f + m_width, +0.0f}};
   };
 
   std::list<Pipe> m_pipes;

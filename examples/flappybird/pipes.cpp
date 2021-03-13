@@ -9,6 +9,8 @@ void Pipes::initializeGL(GLuint program) {
   auto seed{std::chrono::steady_clock::now().time_since_epoch().count()};
   m_randomEngine.seed(seed);
 
+  m_pipes.clear();
+
   m_program = program;
   m_colorLoc = glGetUniformLocation(m_program, "color");
   m_translationLoc = glGetUniformLocation(m_program, "translation");
@@ -38,19 +40,21 @@ void Pipes::terminateGL() {
   }
 }
 
-void Pipes::update(const Bird &bird, float deltaTime) {
-  // At least 250 ms must have passed to create new pipe
-  if (m_pipeCooldownTimer.elapsed() > 4000.0 / 1000.0) {
-    m_pipeCooldownTimer.restart();
-    m_pipes.push_back(createPipe(bird));
-  }
+void Pipes::update(const Bird &bird, const GameData &gameData, float deltaTime) {
+  if (gameData.m_state == State::Playing) {
+    // At least 250 ms must have passed to create new pipe
+    if (m_pipeCooldownTimer.elapsed() > 4000.0 / 1000.0) {
+      m_pipeCooldownTimer.restart();
+      m_pipes.push_back(createPipe(bird));
+    }
 
-  float birdVelocity{0.3f};
-  for (auto &pipe : m_pipes) {
-    pipe.m_translation.x -= birdVelocity * deltaTime;
-    
-    if (pipe.m_translation.x < -1.5f) {
-      pipe.m_dead = true;
+    float birdVelocity{0.3f};
+    for (auto &pipe : m_pipes) {
+      pipe.m_translation.x -= birdVelocity * deltaTime;
+      
+      if (pipe.m_translation.x < -1.5f) {
+        pipe.m_dead = true;
+      }
     }
   }
 
@@ -61,7 +65,7 @@ void Pipes::update(const Bird &bird, float deltaTime) {
 Pipes::Pipe Pipes::createPipe(const Bird &bird) {
   Pipe pipe;
   
-  float middleDistance{3 * bird.m_birdRadius};
+  float middleDistance{3 * bird.m_radius};
 
   auto &re{m_randomEngine};  
   std::uniform_real_distribution<float> randomMiddle{-0.9f + middleDistance, 0.9f - middleDistance};
@@ -73,15 +77,15 @@ Pipes::Pipe Pipes::createPipe(const Bird &bird) {
   // Create geometry
   std::array<glm::vec2, 8> positions{
     // upper pipe
-    glm::vec2{pipe.m_pipeLeft, pipe.m_upperPipeTop}, 
-    glm::vec2{pipe.m_pipeRight, pipe.m_upperPipeTop},
-    glm::vec2{pipe.m_pipeLeft, pipe.m_upperPipeBottom}, 
-    glm::vec2{pipe.m_pipeRight, pipe.m_upperPipeBottom},
+    glm::vec2{-pipe.m_width/2, pipe.m_upperPipeTop},    // leftmost top
+    glm::vec2{+pipe.m_width/2, pipe.m_upperPipeTop},    // rightmost top
+    glm::vec2{-pipe.m_width/2, pipe.m_upperPipeBottom}, // leftmost bottom
+    glm::vec2{+pipe.m_width/2, pipe.m_upperPipeBottom}, // rightmost bottom
     // lower pipe
-    glm::vec2{pipe.m_pipeLeft, pipe.m_lowerPipeTop}, 
-    glm::vec2{pipe.m_pipeRight, pipe.m_lowerPipeTop},
-    glm::vec2{pipe.m_pipeLeft, pipe.m_lowerPipeBottom}, 
-    glm::vec2{pipe.m_pipeRight, pipe.m_lowerPipeBottom}
+    glm::vec2{-pipe.m_width/2, pipe.m_lowerPipeTop},    // leftmost top
+    glm::vec2{+pipe.m_width/2, pipe.m_lowerPipeTop},    // rightmost top
+    glm::vec2{-pipe.m_width/2, pipe.m_lowerPipeBottom}, //leftmost bottom
+    glm::vec2{+pipe.m_width/2, pipe.m_lowerPipeBottom}, // rightmost bottom
   };
 
   std::array indices{0, 1, 2,

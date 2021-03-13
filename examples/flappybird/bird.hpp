@@ -32,10 +32,9 @@ class Bird {
 
   glm::vec4 m_color{1};
   glm::vec2 m_translation{0, 0};
-  glm::vec2 m_birdLocation{0.0f, 0.0f};
 
-  float m_acceleration{0.0f};
-  float m_birdRadius{0.1f};
+  float m_acceleration{0};
+  float m_radius{0.1f};
   
   int m_defaultPolygonSides{40};
 
@@ -45,6 +44,7 @@ class Bird {
   abcg::ElapsedTimer m_moveCooldownTimer;
 
   void setupModel(std::vector<glm::vec2> positions);
+  void resetBird();
 };
 
 #endif
