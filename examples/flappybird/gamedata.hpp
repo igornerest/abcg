@@ -8,6 +8,7 @@ enum class State { Playing, GameOver };
 struct GameData {
   State m_state{State::Playing};
   bool m_shouldJump{false};
+  int m_score{0};
 };
 
 #endif

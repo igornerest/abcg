@@ -39,6 +39,7 @@ class Pipes {
     float m_width{0.4f};
 
     bool m_dead{false};
+    bool m_behindBird{false};
 
     glm::vec4 m_color{1};
     glm::vec2 m_translation{glm::vec2{+1.0f + m_width, +0.0f}};

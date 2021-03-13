@@ -28,6 +28,14 @@ void OpenGLWindow::handleEvent(SDL_Event &event) {
 }
 
 void OpenGLWindow::initializeGL() {
+  // Load a new font
+  ImGuiIO &io{ImGui::GetIO()};
+  auto filename{getAssetsPath() + "Inconsolata-Medium.ttf"};
+  m_font = io.Fonts->AddFontFromFileTTF(filename.c_str(), 60.0f);
+  if (m_font == nullptr) {
+    throw abcg::Exception{abcg::Exception::Runtime("Cannot load font file")};
+  }
+
   // Create program to render the other objects
   m_program = createProgramFromFile(getAssetsPath() + "objects.vert",
                                     getAssetsPath() + "objects.frag");
@@ -50,6 +58,7 @@ void OpenGLWindow::restart() {
   m_bird.initializeGL(m_program);
 
   m_gameData.m_state = State::Playing;
+  m_gameData.m_score = 0;
 }
 
 void OpenGLWindow::update() {
@@ -80,6 +89,26 @@ void OpenGLWindow::paintGL() {
 }
 
 void OpenGLWindow::paintUI() {
+  // display score
+  {
+    std::string scoreStr = std::to_string(m_gameData.m_score);
+
+    auto size{ImVec2(scoreStr.size() * 40, 85)};
+    auto position{ImVec2((m_viewportWidth - size.x) / 2.0f,
+                         (m_viewportHeight - size.y) / 4.0f)};
+
+    ImGui::SetNextWindowPos(position);
+    ImGui::SetNextWindowSize(size);
+    ImGuiWindowFlags flags{ImGuiWindowFlags_NoBackground |
+                            ImGuiWindowFlags_NoTitleBar |
+                            ImGuiWindowFlags_NoInputs};
+
+    ImGui::Begin(" ", nullptr, flags);
+    ImGui::PushFont(m_font);
+    ImGui::Text(scoreStr.c_str());
+    ImGui::PopFont();
+    ImGui::End();
+  }
 }
 
 void OpenGLWindow::resizeGL(int width, int height) {
@@ -100,13 +129,18 @@ void OpenGLWindow::checkCollisions() {
   bool hasCollided{false};
   bool hasFallen{false};
 
-  // check collision between bird and pipes
   for (auto &pipe : m_pipes.m_pipes) {
     if (std::abs(pipe.m_translation.x) < pipe.m_width/2 + m_bird.m_radius) {
+      // check collision between bird and pipes
       if (m_bird.m_translation.y + m_bird.m_radius > pipe.m_upperPipeBottom || 
           m_bird.m_translation.y - m_bird.m_radius < pipe.m_lowerPipeTop) {
             hasCollided = true;
-            break;
+      }
+
+      // check if bird passed a pair of pipes
+      if (pipe.m_translation.x < -(m_bird.m_radius * 2) && !pipe.m_behindBird) {
+        pipe.m_behindBird = true;
+        m_gameData.m_score++;
       }
     }
   }
