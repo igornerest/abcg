@@ -13,7 +13,7 @@ class Pipes;
 class Bird {
  public:
   void initializeGL(GLuint program);
-  void paintGL();
+  void paintGL(const GameData &gameData);
   void terminateGL();
 
   void update(const GameData &gameData, float deltaTime);
@@ -23,25 +23,28 @@ class Bird {
   friend Pipes;
 
   GLuint m_program{};
-  GLint m_pointSizeLoc{};
   GLint m_colorLoc{};
   GLint m_translationLoc{};
+  GLint m_rotationLoc{};
 
   GLuint m_vao{};
   GLuint m_vbo{};
 
   glm::vec4 m_color{1};
-  glm::vec2 m_translation{0, 0};
-
-  float m_acceleration{0};
+  glm::vec2 m_translation{0.0f, 0.0f};
+  glm::vec2 m_velocity{0.3f, 0.0f};
+  
+  float m_rotation{0.0f};
   float m_radius{0.1f};
   
-  int m_defaultPolygonSides{40};
+  int m_closedMouthPolygonSides{40};
+  int m_openMouthPolygonSides{0};
 
   std::default_random_engine m_randomEngine;
 
   abcg::ElapsedTimer m_jumpCooldownTimer;
   abcg::ElapsedTimer m_moveCooldownTimer;
+  abcg::ElapsedTimer m_mouthBlinkTimer;
 
   void setupModel(std::vector<glm::vec2> positions);
   void resetBird();

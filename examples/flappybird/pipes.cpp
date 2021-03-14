@@ -48,10 +48,8 @@ void Pipes::update(const Bird &bird, const GameData &gameData, float deltaTime) 
       m_pipes.push_back(createPipe(bird));
     }
 
-    float birdVelocity{0.3f};
     for (auto &pipe : m_pipes) {
-      pipe.m_translation.x -= birdVelocity * deltaTime;
-      
+      pipe.m_translation.x -= bird.m_velocity.x * deltaTime;
       if (pipe.m_translation.x < -1.5f) {
         pipe.m_dead = true;
       }

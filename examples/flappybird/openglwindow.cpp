@@ -36,9 +36,12 @@ void OpenGLWindow::initializeGL() {
     throw abcg::Exception{abcg::Exception::Runtime("Cannot load font file")};
   }
 
-  // Create program to render the other objects
-  m_program = createProgramFromFile(getAssetsPath() + "objects.vert",
-                                    getAssetsPath() + "objects.frag");
+  // Create program to render pipes
+  m_pipeProgram = createProgramFromFile(getAssetsPath() + "pipe.vert",
+                                        getAssetsPath() + "pipe.frag");
+  // Create program to render the bird
+  m_birdProgram = createProgramFromFile(getAssetsPath() + "bird.vert",
+                                        getAssetsPath() + "bird.frag");
 
   glClearColor(0, 0, 0, 1);
 
@@ -54,8 +57,8 @@ void OpenGLWindow::initializeGL() {
 }
 
 void OpenGLWindow::restart() {
-  m_pipes.initializeGL(m_program);
-  m_bird.initializeGL(m_program);
+  m_pipes.initializeGL(m_pipeProgram);
+  m_bird.initializeGL(m_birdProgram);
 
   m_gameData.m_state = State::Playing;
   m_gameData.m_score = 0;
@@ -85,7 +88,7 @@ void OpenGLWindow::paintGL() {
   glViewport(0, 0, m_viewportWidth, m_viewportHeight);
 
   m_pipes.paintGL();
-  m_bird.paintGL();
+  m_bird.paintGL(m_gameData);
 }
 
 void OpenGLWindow::paintUI() {
@@ -119,8 +122,8 @@ void OpenGLWindow::resizeGL(int width, int height) {
 }
 
 void OpenGLWindow::terminateGL() {
-  glDeleteProgram(m_program);
-
+  glDeleteProgram(m_birdProgram);
+  glDeleteProgram(m_pipeProgram);
   m_pipes.terminateGL();
   m_bird.terminateGL();
 }
@@ -146,7 +149,7 @@ void OpenGLWindow::checkCollisions() {
   }
 
   // check if bird has fallen
-  if (std::abs(m_bird.m_translation.y) + m_bird.m_radius > 1.0f) {
+  if (m_bird.m_translation.y - m_bird.m_radius < -1.0f) {
     hasFallen = true;
   }
 

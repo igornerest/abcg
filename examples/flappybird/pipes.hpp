@@ -42,7 +42,7 @@ class Pipes {
     bool m_behindBird{false};
 
     glm::vec4 m_color{1};
-    glm::vec2 m_translation{glm::vec2{+1.0f + m_width, +0.0f}};
+    glm::vec2 m_translation{+1.0f + m_width, +0.0f};
   };
 
   std::list<Pipe> m_pipes;

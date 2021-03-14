@@ -19,8 +19,9 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   void terminateGL() override;
 
  private:
-  GLuint m_program{};
-
+  GLuint m_birdProgram{};
+  GLuint m_pipeProgram{};
+  
   int m_viewportWidth{};
   int m_viewportHeight{};
 
