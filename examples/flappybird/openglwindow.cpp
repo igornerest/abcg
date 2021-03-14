@@ -84,6 +84,7 @@ void OpenGLWindow::update() {
 void OpenGLWindow::paintGL() {
   update();
 
+  glClearColor(0.3, 0.5, 0.8, 1);
   glClear(GL_COLOR_BUFFER_BIT);
   glViewport(0, 0, m_viewportWidth, m_viewportHeight);
 

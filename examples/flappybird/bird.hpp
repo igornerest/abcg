@@ -30,7 +30,7 @@ class Bird {
   GLuint m_vao{};
   GLuint m_vbo{};
 
-  glm::vec4 m_color{1};
+  glm::vec4 m_color{0.75, 0.75, 0.0, 1.0}; // yellow
   glm::vec2 m_translation{0.0f, 0.0f};
   glm::vec2 m_velocity{0.3f, 0.0f};
   

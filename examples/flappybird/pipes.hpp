@@ -41,7 +41,7 @@ class Pipes {
     bool m_dead{false};
     bool m_behindBird{false};
 
-    glm::vec4 m_color{1};
+    glm::vec4 m_color{0.0, 0.75, 0.4, 1}; // green
     glm::vec2 m_translation{+1.0f + m_width, +0.0f};
   };
 
