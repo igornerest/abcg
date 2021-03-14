@@ -43,10 +43,11 @@ void Pipes::terminateGL() {
 void Pipes::update(const Bird &bird, const GameData &gameData, float deltaTime) {
   if (gameData.m_state == State::Playing) {
     // At least 250 ms must have passed to create new pipe
-    if (m_pipeCooldownTimer.elapsed() > 4000.0 / 1000.0) {
-      m_pipeCooldownTimer.restart();
+    if (m_lastPipeDistance > 1.0) {
       m_pipes.push_back(createPipe(bird));
+      m_lastPipeDistance = 0;
     }
+    m_lastPipeDistance += bird.m_velocity.x * deltaTime;
 
     for (auto &pipe : m_pipes) {
       pipe.m_translation.x -= bird.m_velocity.x * deltaTime;

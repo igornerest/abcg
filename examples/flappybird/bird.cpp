@@ -69,7 +69,7 @@ void Bird::paintGL(const GameData &gameData) {
   if (m_mouthBlinkTimer.elapsed() > 1000.0 / 1000.0) {
     m_mouthBlinkTimer.restart();
   }
-  int polygonSides = m_mouthBlinkTimer.elapsed() < 500.0 / 1000.0 && gameData.m_state == State::Playing ?
+  int polygonSides = m_mouthBlinkTimer.elapsed() < 400.0/1000.0 && gameData.m_state == State::Playing ?
                      m_closedMouthPolygonSides + 2:
                      m_openMouthPolygonSides;
 
@@ -86,23 +86,31 @@ void Bird::terminateGL() {
   glDeleteVertexArrays(1, &m_vao);
 }
 
-void Bird::update(const GameData &gameData, float deltaTime) {
+void Bird::update(const GameData &gameData) {
+  // Bird is updated every 60ms
+  if (m_moveCooldownTimer.elapsed() < 1.0/60.0)
+    return;
+
+  m_moveCooldownTimer.restart();
+  
   if (m_translation.y - m_radius > -1.0f) {
-    if (m_moveCooldownTimer.elapsed() > 10.0 / 1000.0) {
-        m_moveCooldownTimer.restart();
-
-        if (gameData.m_state == State::Playing) {
-          m_velocity.x += 0.0001f;
-          m_velocity.y = gameData.m_shouldJump ? std::max(m_velocity.y, 0.01f) : m_velocity.y - 0.001f;
-        }
-
-        m_translation.y += m_velocity.y;
-        m_rotation = -std::atan2(-m_velocity.y, m_radius/4);
+    if (gameData.m_state == State::Playing) {
+      m_velocity.x += 0.0001f;
+      
+      if (gameData.m_shouldJump && m_jumpCooldownTimer.elapsed() > 250.0/1000.0) {
+        m_jumpCooldownTimer.restart();
+        m_velocity.y = std::max(m_velocity.y, 0.02f);
+      } 
     }
+
+    m_velocity.y -= 0.001f;
+    m_translation.y += m_velocity.y;
+    m_rotation = -std::atan2(-m_velocity.y, m_radius/4);
   }
 }
 
 void Bird::resetBird() {
+  m_openMouthPolygonSides = 0;
   m_translation = glm::vec2(0.0f, 0.0f);
   m_velocity = glm::vec2(0.3f, 0.0f);
   m_rotation = 0.0f;

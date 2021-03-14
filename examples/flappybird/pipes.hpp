@@ -36,7 +36,7 @@ class Pipes {
     float m_lowerPipeTop;
     float m_lowerPipeBottom{-1.0f};
 
-    float m_width{0.4f};
+    float m_width{0.3f};
 
     bool m_dead{false};
     bool m_behindBird{false};
@@ -49,7 +49,7 @@ class Pipes {
 
   std::default_random_engine m_randomEngine;
 
-  abcg::ElapsedTimer m_pipeCooldownTimer;
+  float m_lastPipeDistance{0};
 
   Pipes::Pipe createPipe(const Bird &bird);
 };

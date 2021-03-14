@@ -16,7 +16,7 @@ class Bird {
   void paintGL(const GameData &gameData);
   void terminateGL();
 
-  void update(const GameData &gameData, float deltaTime);
+  void update(const GameData &gameData);
 
  private:
   friend OpenGLWindow;

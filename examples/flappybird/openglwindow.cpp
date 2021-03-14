@@ -73,7 +73,7 @@ void OpenGLWindow::update() {
     return;
   }
 
-  m_bird.update(m_gameData, deltaTime);
+  m_bird.update(m_gameData);
   m_pipes.update(m_bird, m_gameData, deltaTime);
 
   if (m_gameData.m_state == State::Playing) {
