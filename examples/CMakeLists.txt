@@ -3,4 +3,8 @@ add_subdirectory(coloredtriangles)
 add_subdirectory(sierpinski)
 add_subdirectory(asteroids)
 add_subdirectory(flappybird)
+add_subdirectory(loadmodel)
+add_subdirectory(lookat)
+add_subdirectory(viewer1)
+add_subdirectory(starfield)
 
