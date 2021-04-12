@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include <cppitertools/itertools.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 
 void OpenGLWindow::handleEvent(SDL_Event& ev) {
     if (ev.type == SDL_KEYDOWN) {
@@ -42,11 +43,11 @@ void OpenGLWindow::initializeGL() {
   glEnable(GL_DEPTH_TEST);
 
   // Create program
-  m_program = createProgramFromFile(getAssetsPath() + "depth.vert",
-                                    getAssetsPath() + "depth.frag");
+  m_program = createProgramFromFile(getAssetsPath() + "blinnphong.vert",
+                                    getAssetsPath() + "blinnphong.frag");
 
   // Load model
-  m_model.loadFromFile(getAssetsPath() + "box.obj");
+  m_model.loadFromFile(getAssetsPath() + "box.obj", false);
   m_model.setupVAO(m_program);
 
   m_maze.initializeMaze(getAssetsPath() + "matrix.txt");
@@ -68,14 +69,34 @@ void OpenGLWindow::paintGL() {
   GLint viewMatrixLoc{glGetUniformLocation(m_program, "viewMatrix")};
   GLint projMatrixLoc{glGetUniformLocation(m_program, "projMatrix")};
   GLint modelMatrixLoc{glGetUniformLocation(m_program, "modelMatrix")};
-  GLint colorLoc{glGetUniformLocation(m_program, "color")};
+  GLint normalMatrixLoc{glGetUniformLocation(m_program, "normalMatrix")};
+  
+  GLint lightDirLoc{glGetUniformLocation(m_program, "lightDirWorldSpace")};
+  GLint shininessLoc{glGetUniformLocation(m_program, "shininess")};
+  
+  GLint IaLoc{glGetUniformLocation(m_program, "Ia")};
+  GLint IdLoc{glGetUniformLocation(m_program, "Id")};
+  GLint IsLoc{glGetUniformLocation(m_program, "Is")};
+  GLint KaLoc{glGetUniformLocation(m_program, "Ka")};
+  GLint KdLoc{glGetUniformLocation(m_program, "Kd")};
+  GLint KsLoc{glGetUniformLocation(m_program, "Ks")};
 
   // Set uniform variables for viewMatrix and projMatrix
   // These matrices are used for every scene object
   glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &m_camera.m_viewMatrix[0][0]);
   glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_camera.m_projMatrix[0][0]);
+  
+  auto lightDirRotated{m_lightDir};
+  glUniform4fv(lightDirLoc, 1, &lightDirRotated.x);
+  glUniform1f(shininessLoc, m_shininess);
+  glUniform4fv(IaLoc, 1, &m_Ia.x);
+  glUniform4fv(IdLoc, 1, &m_Id.x);
+  glUniform4fv(IsLoc, 1, &m_Is.x);
+  glUniform4fv(KaLoc, 1, &m_Ka.x);
+  glUniform4fv(KdLoc, 1, &m_Kd.x);
+  glUniform4fv(KsLoc, 1, &m_Ks.x);
 
-  // Draw all wall boxes
+  // Draw all wall boxes by setting uniform variables of the current object
   for (size_t i = 0; i < m_maze.m_mazeMatrix.size(); i++) {
     for (size_t j = 0; j < m_maze.m_mazeMatrix[i].size(); j++) {
       if (m_maze.isBox(i, j)) {
@@ -84,10 +105,11 @@ void OpenGLWindow::paintGL() {
 
         glm::mat4 modelMatrix{1.0f};
         modelMatrix = glm::translate(modelMatrix, glm::vec3(xPos, 0.0f, yPos));
-
-        // Set uniform variables of the current object
         glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
-        glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);  // White Box
+        
+        auto modelViewMatrix{glm::mat3(m_camera.m_viewMatrix * modelMatrix)};
+        glm::mat3 normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+        glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
 
         m_model.render();
       }

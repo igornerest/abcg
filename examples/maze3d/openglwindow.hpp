@@ -30,7 +30,16 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   float m_truckSpeed{0.0f};
   float m_panSpeed{0.0f};
 
-  glm::mat4 m_modelMatrix{1.0f};
+  // Light and material properties
+  glm::vec4 m_lightDir{0.1f, 0.1f, 0.1f, 0.0f};
+  glm::vec4 m_Ia{1.0f, 1.0f, 1.0f, 1.0f};
+  glm::vec4 m_Id{1.0f, 1.0f, 1.0f, 1.0f};
+  glm::vec4 m_Is{1.0f, 1.0f, 1.0f, 1.0f};
+  glm::vec4 m_Ka{0.1f, 0.1f, 0.1f, 1.0f};
+  glm::vec4 m_Kd{0.7f, 0.7f, 0.7f, 1.0f};
+  glm::vec4 m_Ks{1.0f, 1.0f, 1.0f, 1.0f};
+  float m_shininess{25.0f};
+
 
   void update();
 };
