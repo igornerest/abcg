@@ -3,6 +3,7 @@
 in vec3 fragN;
 in vec3 fragL;
 in vec3 fragV;
+in float fragAttenuation;
 
 // Light properties
 uniform vec4 Ia, Id, Is;
@@ -37,7 +38,7 @@ vec4 BlinnPhong(vec3 N, vec3 L, vec3 V) {
 }
 
 void main() {
-  vec4 color = BlinnPhong(fragN, fragL, fragV);
+  vec4 color = fragAttenuation * BlinnPhong(fragN, fragL, fragV);
 
   if (gl_FrontFacing) {
     outColor = color;
