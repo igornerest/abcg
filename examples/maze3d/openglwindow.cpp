@@ -86,7 +86,7 @@ void OpenGLWindow::paintGL() {
   glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &m_camera.m_viewMatrix[0][0]);
   glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_camera.m_projMatrix[0][0]);
   
-  glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
+  glm::vec4 lightPos(m_camera.m_eye, 1.0f);
   glUniform4fv(lightPosLoc, 1, &lightPos.x);
   glUniform1f(shininessLoc, m_shininess);
   glUniform4fv(IaLoc, 1, &m_Ia.x);
