@@ -21,7 +21,8 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   int m_viewportWidth{};
   int m_viewportHeight{};
 
-  Model m_model;
+  Model m_grassModel;
+  Model m_wallModel;
 
   Maze m_maze;
 

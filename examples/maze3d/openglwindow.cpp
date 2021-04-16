@@ -52,15 +52,18 @@ void OpenGLWindow::initializeGL() {
   m_program = createProgramFromFile(getAssetsPath() + "shaders/normalmapping.vert",
                                     getAssetsPath() + "shaders/normalmapping.frag");
 
-  // Load model
-  m_model.loadFromFile(getAssetsPath() + "box.obj", false);
-  m_model.setupVAO(m_program);
+  // Load models
+  m_grassModel.loadFromFile(getAssetsPath() + "grass.obj", false);
+  m_grassModel.setupVAO(m_program);
 
-  // Use material properties from the loaded model
-  m_Ka = m_model.getKa();
-  m_Kd = m_model.getKd();
-  m_Ks = m_model.getKs();
-  m_shininess = m_model.getShininess();
+  m_wallModel.loadFromFile(getAssetsPath() + "box.obj", false);
+  m_wallModel.setupVAO(m_program);
+
+  // Use material properties from the loaded model (they are the same)
+  m_Ka = m_wallModel.getKa();
+  m_Kd = m_wallModel.getKd();
+  m_Ks = m_wallModel.getKs();
+  m_shininess = m_wallModel.getShininess();
   m_mappingMode = 3;  // "From mesh" option
 
   m_maze.initializeMaze(getAssetsPath() + "levels/level1.txt");
@@ -118,19 +121,22 @@ void OpenGLWindow::paintGL() {
   // Draw all wall boxes by setting uniform variables of the current object
   for (size_t i = 0; i < m_maze.m_mazeMatrix.size(); i++) {
     for (size_t j = 0; j < m_maze.m_mazeMatrix[i].size(); j++) {
+      float xPos =  static_cast<float>(i);
+      float yPos =  static_cast<float>(j);
+
+      glm::mat4 modelMatrix{1.0f};
+      modelMatrix = glm::translate(modelMatrix, glm::vec3(xPos, 0.0f, yPos));
+      glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+
+      auto modelViewMatrix{glm::mat3(m_camera.m_viewMatrix * modelMatrix)};
+      glm::mat3 normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+      glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
+      
       if (m_maze.isBox(i, j)) {
-        float xPos =  static_cast<float>(i);
-        float yPos =  static_cast<float>(j);
-
-        glm::mat4 modelMatrix{1.0f};
-        modelMatrix = glm::translate(modelMatrix, glm::vec3(xPos, 0.0f, yPos));
-        glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
-        
-        auto modelViewMatrix{glm::mat3(m_camera.m_viewMatrix * modelMatrix)};
-        glm::mat3 normalMatrix{glm::inverseTranspose(modelViewMatrix)};
-        glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
-
-        m_model.render();
+        m_wallModel.render();
+      }
+      else {
+        m_grassModel.render();
       }
     }
   }
