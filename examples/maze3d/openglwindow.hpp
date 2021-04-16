@@ -28,8 +28,6 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   Camera m_camera;
   float m_dollySpeed{0.0f};
   float m_truckSpeed{0.0f};
-  float m_panSpeed{0.0f};
-  float m_tiltSpeed{0.0f};
 
   bool m_screenFocus{false};
   abcg::ElapsedTimer m_mouseTimer{};

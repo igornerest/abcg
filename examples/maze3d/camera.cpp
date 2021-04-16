@@ -74,7 +74,11 @@ void Camera::tilt(float speed) {
   transform = glm::rotate(transform, -speed, glm::cross(m_up, forward));
   transform = glm::translate(transform, -m_eye);
 
-  m_at = transform * glm::vec4(m_at, 1.0f);
+  glm::vec3 newAtPosition = transform * glm::vec4(m_at, 1.0f);
+  float newViewAngle = glm::acos(glm::dot(glm::normalize(m_atBase - m_eye), glm::normalize(newAtPosition - m_eye)));
 
-  computeViewMatrix();
+  if (newViewAngle < 1.0) {
+    m_at = newAtPosition;
+    computeViewMatrix();
+  }
 }
