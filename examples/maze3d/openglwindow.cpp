@@ -43,8 +43,8 @@ void OpenGLWindow::initializeGL() {
   glEnable(GL_DEPTH_TEST);
 
   // Create program
-  m_program = createProgramFromFile(getAssetsPath() + "normalmapping.vert",
-                                    getAssetsPath() + "normalmapping.frag");
+  m_program = createProgramFromFile(getAssetsPath() + "shaders/normalmapping.vert",
+                                    getAssetsPath() + "shaders/normalmapping.frag");
 
   // Load model
   m_model.loadFromFile(getAssetsPath() + "box.obj", false);
@@ -57,7 +57,7 @@ void OpenGLWindow::initializeGL() {
   m_shininess = m_model.getShininess();
   m_mappingMode = 3;  // "From mesh" option
 
-  m_maze.initializeMaze(getAssetsPath() + "matrix.txt");
+  m_maze.initializeMaze(getAssetsPath() + "levels/level1.txt");
   
   m_camera.initializeCamera(m_maze);
 }
