@@ -2,3 +2,4 @@ newmtl box
 	Ka 0.1000 0.1000 0.1000
 	Kd 0.7000 0.7000 0.7000
 	Ks 0.1000 0.1000 0.1000
+  map_Kd maps/brick_base.jpg

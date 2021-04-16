@@ -30,6 +30,10 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   float m_truckSpeed{0.0f};
   float m_panSpeed{0.0f};
 
+  // Mapping mode
+  // 0: triplanar; 1: cylindrical; 2: spherical; 3: from mesh
+  int m_mappingMode{};
+
   // Light and material properties
   glm::vec4 m_Ia{1.0f};
   glm::vec4 m_Id{1.0f};
@@ -38,7 +42,6 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   glm::vec4 m_Kd;
   glm::vec4 m_Ks;
   float m_shininess{};
-
 
   void update();
 };

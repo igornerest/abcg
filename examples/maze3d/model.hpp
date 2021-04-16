@@ -6,11 +6,13 @@
 struct Vertex {
   glm::vec3 position{};
   glm::vec3 normal{};
+  glm::vec2 texCoord{};
 
   bool operator==(const Vertex& other) const noexcept {
     static const auto epsilon{std::numeric_limits<float>::epsilon()};
     return glm::all(glm::epsilonEqual(position, other.position, epsilon)) &&
-           glm::all(glm::epsilonEqual(normal, other.normal, epsilon));
+           glm::all(glm::epsilonEqual(normal, other.normal, epsilon)) &&
+           glm::all(glm::epsilonEqual(texCoord, other.texCoord, epsilon));
   }
 };
 
@@ -24,6 +26,7 @@ class Model {
   Model& operator=(const Model&) = delete;
   Model& operator=(Model&&) = default;
 
+  void loadDiffuseTexture(std::string_view path);
   void loadFromFile(std::string_view path, bool standardize = true);
   void render() const;
   void setupVAO(GLuint program);
@@ -42,11 +45,13 @@ class Model {
   glm::vec4 m_Kd;
   glm::vec4 m_Ks;
   float m_shininess;
-  
+  GLuint m_diffuseTexture{};
+
   std::vector<Vertex> m_vertices;
   std::vector<GLuint> m_indices;
 
   bool m_hasNormals{false};
+  bool m_hasTexCoords{false};
 
   void createBuffers();
   void standardize();

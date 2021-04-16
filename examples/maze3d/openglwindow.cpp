@@ -43,8 +43,8 @@ void OpenGLWindow::initializeGL() {
   glEnable(GL_DEPTH_TEST);
 
   // Create program
-  m_program = createProgramFromFile(getAssetsPath() + "blinnphong.vert",
-                                    getAssetsPath() + "blinnphong.frag");
+  m_program = createProgramFromFile(getAssetsPath() + "texture.vert",
+                                    getAssetsPath() + "texture.frag");
 
   // Load model
   m_model.loadFromFile(getAssetsPath() + "box.obj", false);
@@ -55,7 +55,8 @@ void OpenGLWindow::initializeGL() {
   m_Kd = m_model.getKd();
   m_Ks = m_model.getKs();
   m_shininess = m_model.getShininess();
-  
+  m_mappingMode = 3;  // "From mesh" option
+
   m_maze.initializeMaze(getAssetsPath() + "matrix.txt");
   
   m_camera.initializeCamera(m_maze);
@@ -86,12 +87,16 @@ void OpenGLWindow::paintGL() {
   GLint KaLoc{glGetUniformLocation(m_program, "Ka")};
   GLint KdLoc{glGetUniformLocation(m_program, "Kd")};
   GLint KsLoc{glGetUniformLocation(m_program, "Ks")};
+  GLint diffuseTexLoc{glGetUniformLocation(m_program, "diffuseTex")};
+  GLint mappingModeLoc{glGetUniformLocation(m_program, "mappingMode")};
 
   // Set uniform variables for viewMatrix and projMatrix
   // These matrices are used for every scene object
   glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &m_camera.m_viewMatrix[0][0]);
   glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_camera.m_projMatrix[0][0]);
-  
+  glUniform1i(diffuseTexLoc, 0);
+  glUniform1i(mappingModeLoc, m_mappingMode);
+
   glm::vec4 lightPos(m_camera.m_eye, 1.0f);
   glUniform4fv(lightPosLoc, 1, &lightPos.x);
   glUniform1f(shininessLoc, m_shininess);
