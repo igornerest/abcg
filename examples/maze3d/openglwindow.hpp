@@ -29,6 +29,10 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   float m_dollySpeed{0.0f};
   float m_truckSpeed{0.0f};
   float m_panSpeed{0.0f};
+  float m_tiltSpeed{0.0f};
+
+  bool m_screenFocus{false};
+  abcg::ElapsedTimer m_mouseTimer{};
 
   // Mapping mode
   // 0: triplanar; 1: cylindrical; 2: spherical; 3: from mesh
@@ -42,8 +46,9 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   glm::vec4 m_Kd;
   glm::vec4 m_Ks;
   float m_shininess{};
-
+  
   void update();
+  glm::vec2 getRotationSpeedFromMouse();
 };
 
 #endif

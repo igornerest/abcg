@@ -5,19 +5,23 @@
 #include <cppitertools/itertools.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
+const auto epsilon{std::numeric_limits<float>::epsilon()};
+
 void OpenGLWindow::handleEvent(SDL_Event& ev) {
-    if (ev.type == SDL_KEYDOWN) {
+  if (ev.type == SDL_KEYDOWN) {
     if (ev.key.keysym.sym == SDLK_UP || ev.key.keysym.sym == SDLK_w)
       m_dollySpeed = 1.0f;
     if (ev.key.keysym.sym == SDLK_DOWN || ev.key.keysym.sym == SDLK_s)
       m_dollySpeed = -1.0f;
     if (ev.key.keysym.sym == SDLK_LEFT || ev.key.keysym.sym == SDLK_a)
-      m_panSpeed = -1.0f;
+      m_truckSpeed = -1.0f;
     if (ev.key.keysym.sym == SDLK_RIGHT || ev.key.keysym.sym == SDLK_d)
-      m_panSpeed = 1.0f;
-    if (ev.key.keysym.sym == SDLK_q) m_truckSpeed = -1.0f;
-    if (ev.key.keysym.sym == SDLK_e) m_truckSpeed = 1.0f;
+      m_truckSpeed = 1.0f;
+    if (ev.key.keysym.sym == SDLK_ESCAPE) {
+      m_screenFocus = false;
+    }
   }
+
   if (ev.type == SDL_KEYUP) {
     if ((ev.key.keysym.sym == SDLK_UP || ev.key.keysym.sym == SDLK_w) &&
         m_dollySpeed > 0)
@@ -26,13 +30,15 @@ void OpenGLWindow::handleEvent(SDL_Event& ev) {
         m_dollySpeed < 0)
       m_dollySpeed = 0.0f;
     if ((ev.key.keysym.sym == SDLK_LEFT || ev.key.keysym.sym == SDLK_a) &&
-        m_panSpeed < 0)
-      m_panSpeed = 0.0f;
+        m_truckSpeed < 0)
+      m_truckSpeed = 0.0f;
     if ((ev.key.keysym.sym == SDLK_RIGHT || ev.key.keysym.sym == SDLK_d) &&
-        m_panSpeed > 0)
-      m_panSpeed = 0.0f;
-    if (ev.key.keysym.sym == SDLK_q && m_truckSpeed < 0) m_truckSpeed = 0.0f;
-    if (ev.key.keysym.sym == SDLK_e && m_truckSpeed > 0) m_truckSpeed = 0.0f;
+        m_truckSpeed > 0)
+      m_truckSpeed = 0.0f;
+  }
+
+  if (ev.type == SDL_MOUSEBUTTONDOWN) {
+    m_screenFocus = true;
   }
 }
 
@@ -150,8 +156,36 @@ void OpenGLWindow::terminateGL() {
 void OpenGLWindow::update() {
   float deltaTime{static_cast<float>(getDeltaTime())};
 
+  glm::vec2 rotationSpeed = getRotationSpeedFromMouse();
+
   // Update LookAt camera
   m_camera.dolly(m_dollySpeed * deltaTime);
   m_camera.truck(m_truckSpeed * deltaTime);
-  m_camera.pan(m_panSpeed * deltaTime);
+  m_camera.pan(rotationSpeed.x * deltaTime);
+  m_camera.tilt(rotationSpeed.y * deltaTime);
+}
+
+glm::vec2 OpenGLWindow::getRotationSpeedFromMouse() {
+  if (!m_screenFocus)
+    return glm::vec2{0, 0};
+  
+  if (m_mouseTimer.elapsed() > 0.10) {
+    SDL_WarpMouseInWindow(nullptr, m_viewportWidth/2, m_viewportHeight/2);
+    m_mouseTimer.restart();
+  }
+
+  glm::ivec2 mousePosition;
+  SDL_GetMouseState(&mousePosition.x, &mousePosition.y);  
+
+  float maxMovement{0.9f};
+  float speedScale{50.0f};
+  glm::vec2 movement{2.0f * mousePosition.x / m_viewportWidth - 1.0f,
+                     1.0f - 2.0f * mousePosition.y / m_viewportHeight};
+  
+  // Avoid infinite tilt/pan movement when cursor gets out of the window
+  if (std::abs(movement.x) > maxMovement || std::abs(movement.y) > maxMovement)
+    return glm::vec2{0, 0};
+
+  return glm::vec2{movement.x * speedScale, movement.y * speedScale};
+
 }
