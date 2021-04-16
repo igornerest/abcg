@@ -50,6 +50,12 @@ void OpenGLWindow::initializeGL() {
   m_model.loadFromFile(getAssetsPath() + "box.obj", false);
   m_model.setupVAO(m_program);
 
+  // Use material properties from the loaded model
+  m_Ka = m_model.getKa();
+  m_Kd = m_model.getKd();
+  m_Ks = m_model.getKs();
+  m_shininess = m_model.getShininess();
+  
   m_maze.initializeMaze(getAssetsPath() + "matrix.txt");
   
   m_camera.initializeCamera(m_maze);

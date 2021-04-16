@@ -28,11 +28,21 @@ class Model {
   void render() const;
   void setupVAO(GLuint program);
 
+  [[nodiscard]] glm::vec4 getKa() const { return m_Ka; }
+  [[nodiscard]] glm::vec4 getKd() const { return m_Kd; }
+  [[nodiscard]] glm::vec4 getKs() const { return m_Ks; }
+  [[nodiscard]] float getShininess() const { return m_shininess; }
+
  private:
   GLuint m_VAO{};
   GLuint m_VBO{};
   GLuint m_EBO{};
 
+  glm::vec4 m_Ka;
+  glm::vec4 m_Kd;
+  glm::vec4 m_Ks;
+  float m_shininess;
+  
   std::vector<Vertex> m_vertices;
   std::vector<GLuint> m_indices;
 

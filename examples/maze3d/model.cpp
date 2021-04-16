@@ -68,6 +68,7 @@ void Model::loadFromFile(std::string_view path, bool standardize) {
 
   const auto& attrib{reader.GetAttrib()};
   const auto& shapes{reader.GetShapes()};
+  const auto& materials{reader.GetMaterials()};
 
   m_vertices.clear();
   m_indices.clear();
@@ -114,6 +115,21 @@ void Model::loadFromFile(std::string_view path, bool standardize) {
 
       m_indices.push_back(hash[vertex]);
     }
+  }
+
+  // Use properties of first material, if available
+  if (!materials.empty()) {
+    const auto& mat{materials.at(0)};  // First material
+    m_Ka = glm::vec4(mat.ambient[0], mat.ambient[1], mat.ambient[2], 1);
+    m_Kd = glm::vec4(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2], 1);
+    m_Ks = glm::vec4(mat.specular[0], mat.specular[1], mat.specular[2], 1);
+    m_shininess = mat.shininess;
+  } else {
+    // Default values
+    m_Ka = {0.1f, 0.1f, 0.1f, 1.0f};
+    m_Kd = {0.7f, 0.7f, 0.7f, 1.0f};
+    m_Ks = {1.0f, 1.0f, 1.0f, 1.0f};
+    m_shininess = 25.0f;
   }
 
   if (standardize) {
