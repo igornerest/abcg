@@ -33,6 +33,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   float m_truckSpeed{0.0f};
 
   bool m_screenFocus{false};
+  bool m_isFlashlightOn{true};
   abcg::ElapsedTimer m_mouseTimer{};
 
   // Mapping mode
@@ -45,6 +46,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   glm::vec4 m_Is{1.0f};
   float m_lightCutOff{0.98f};
   float m_lightOuterCutOff{0.92f};
+  float m_lightOff{2.00f};
 
   // Material properties
   glm::vec4 m_Ka;

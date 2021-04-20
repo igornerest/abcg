@@ -11,29 +11,34 @@ void OpenGLWindow::handleEvent(SDL_Event& ev) {
   if (ev.type == SDL_KEYDOWN) {
     if (ev.key.keysym.sym == SDLK_UP || ev.key.keysym.sym == SDLK_w)
       m_dollySpeed = 1.0f;
+
     if (ev.key.keysym.sym == SDLK_DOWN || ev.key.keysym.sym == SDLK_s)
       m_dollySpeed = -1.0f;
+    
     if (ev.key.keysym.sym == SDLK_LEFT || ev.key.keysym.sym == SDLK_a)
       m_truckSpeed = -1.0f;
+    
     if (ev.key.keysym.sym == SDLK_RIGHT || ev.key.keysym.sym == SDLK_d)
       m_truckSpeed = 1.0f;
-    if (ev.key.keysym.sym == SDLK_ESCAPE) {
+
+    if (ev.key.keysym.sym == SDLK_f)
+      m_isFlashlightOn = !m_isFlashlightOn;
+    
+    if (ev.key.keysym.sym == SDLK_ESCAPE)
       m_screenFocus = false;
-    }
   }
 
   if (ev.type == SDL_KEYUP) {
-    if ((ev.key.keysym.sym == SDLK_UP || ev.key.keysym.sym == SDLK_w) &&
-        m_dollySpeed > 0)
+    if ((ev.key.keysym.sym == SDLK_UP || ev.key.keysym.sym == SDLK_w) && m_dollySpeed > 0)
       m_dollySpeed = 0.0f;
-    if ((ev.key.keysym.sym == SDLK_DOWN || ev.key.keysym.sym == SDLK_s) &&
-        m_dollySpeed < 0)
+
+    if ((ev.key.keysym.sym == SDLK_DOWN || ev.key.keysym.sym == SDLK_s) && m_dollySpeed < 0)
       m_dollySpeed = 0.0f;
-    if ((ev.key.keysym.sym == SDLK_LEFT || ev.key.keysym.sym == SDLK_a) &&
-        m_truckSpeed < 0)
+
+    if ((ev.key.keysym.sym == SDLK_LEFT || ev.key.keysym.sym == SDLK_a) && m_truckSpeed < 0)
       m_truckSpeed = 0.0f;
-    if ((ev.key.keysym.sym == SDLK_RIGHT || ev.key.keysym.sym == SDLK_d) &&
-        m_truckSpeed > 0)
+
+    if ((ev.key.keysym.sym == SDLK_RIGHT || ev.key.keysym.sym == SDLK_d) && m_truckSpeed > 0)
       m_truckSpeed = 0.0f;
   }
 
@@ -144,8 +149,8 @@ void OpenGLWindow::renderMaze() {
   glm::vec4 lightPos(m_camera.m_eye, 1.0f);
   glUniform4fv(lightDirLoc, 1, &lightDir.x);
   glUniform4fv(lightPosLoc, 1, &lightPos.x);
-  glUniform1f(lightCutOffLoc, m_lightCutOff);
-  glUniform1f(lightOuterCutOffLoc, m_lightOuterCutOff);
+  glUniform1f(lightCutOffLoc, m_isFlashlightOn ? m_lightCutOff : m_lightOff);
+  glUniform1f(lightOuterCutOffLoc, m_isFlashlightOn ? m_lightOuterCutOff : m_lightOff);
 
   glUniform4fv(IaLoc, 1, &m_Ia.x);
   glUniform4fv(IdLoc, 1, &m_Id.x);
