@@ -17,13 +17,15 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
  private: 
   GLuint m_program{};
+  GLuint m_skyProgram{};
 
   int m_viewportWidth{};
   int m_viewportHeight{};
 
   Model m_grassModel;
   Model m_wallModel;
-
+  Model m_skyModel;
+  
   Maze m_maze;
 
   Camera m_camera;
@@ -45,7 +47,9 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   glm::vec4 m_Kd;
   glm::vec4 m_Ks;
   float m_shininess{};
-  
+
+  void renderMaze();
+  void renderSkybox();
   void update();
   glm::vec2 getRotationSpeedFromMouse();
 };

@@ -48,16 +48,24 @@ void OpenGLWindow::initializeGL() {
   // Enable depth buffering
   glEnable(GL_DEPTH_TEST);
 
-  // Create program
+  // Create programs
   m_program = createProgramFromFile(getAssetsPath() + "shaders/normalmapping.vert",
                                     getAssetsPath() + "shaders/normalmapping.frag");
+
+  m_skyProgram = createProgramFromFile(getAssetsPath() + "shaders/skybox.vert",
+                                       getAssetsPath() + "shaders/skybox.frag");
 
   // Load models
   m_grassModel.loadFromFile(getAssetsPath() + "grass.obj", false);
   m_grassModel.setupVAO(m_program);
 
-  m_wallModel.loadFromFile(getAssetsPath() + "box.obj", false);
+  m_wallModel.loadFromFile(getAssetsPath() + "wall.obj", false);
   m_wallModel.setupVAO(m_program);
+
+  // Load cubemap
+  m_skyModel.loadFromFile(getAssetsPath() + "skybox.obj", false);
+  m_skyModel.loadCubeTexture(getAssetsPath() + "maps/cube/");
+  m_skyModel.setupVAO(m_skyProgram);
 
   // Use material properties from the loaded model (they are the same)
   m_Ka = m_wallModel.getKa();
@@ -79,12 +87,33 @@ void OpenGLWindow::paintGL() {
 
   glViewport(0, 0, m_viewportWidth, m_viewportHeight);
 
+  renderMaze();
+  renderSkybox();
+}
+
+void OpenGLWindow::paintUI() { 
+  abcg::OpenGLWindow::paintUI(); 
+}
+
+void OpenGLWindow::resizeGL(int width, int height) {
+  m_viewportWidth = width;
+  m_viewportHeight = height;
+
+  m_camera.computeProjectionMatrix(width, height);
+}
+
+void OpenGLWindow::terminateGL() { 
+  glDeleteProgram(m_program); 
+  glDeleteProgram(m_skyProgram);
+}
+
+void OpenGLWindow::renderMaze() {
   glUseProgram(m_program);
 
   // Get location of uniform variables (could be precomputed)
+  GLint modelMatrixLoc{glGetUniformLocation(m_program, "modelMatrix")};
   GLint viewMatrixLoc{glGetUniformLocation(m_program, "viewMatrix")};
   GLint projMatrixLoc{glGetUniformLocation(m_program, "projMatrix")};
-  GLint modelMatrixLoc{glGetUniformLocation(m_program, "modelMatrix")};
   GLint normalMatrixLoc{glGetUniformLocation(m_program, "normalMatrix")};
   
   GLint lightPosLoc{glGetUniformLocation(m_program, "lightPosWorldSpace")};
@@ -131,7 +160,7 @@ void OpenGLWindow::paintGL() {
       auto modelViewMatrix{glm::mat3(m_camera.m_viewMatrix * modelMatrix)};
       glm::mat3 normalMatrix{glm::inverseTranspose(modelViewMatrix)};
       glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
-      
+        
       if (m_maze.isBox(i, j)) {
         m_wallModel.render();
       }
@@ -144,19 +173,32 @@ void OpenGLWindow::paintGL() {
   glUseProgram(0);
 }
 
-void OpenGLWindow::paintUI() { 
-  abcg::OpenGLWindow::paintUI(); 
-}
+void OpenGLWindow::renderSkybox() {
+  glUseProgram(m_skyProgram);
 
-void OpenGLWindow::resizeGL(int width, int height) {
-  m_viewportWidth = width;
-  m_viewportHeight = height;
+  // Get location of uniform variables
+  GLint modelMatrixLoc{glGetUniformLocation(m_program, "modelMatrix")};
+  GLint viewMatrixLoc{glGetUniformLocation(m_skyProgram, "viewMatrix")};
+  GLint projMatrixLoc{glGetUniformLocation(m_skyProgram, "projMatrix")};
+  GLint skyTexLoc{glGetUniformLocation(m_skyProgram, "skyTex")};
 
-  m_camera.computeProjectionMatrix(width, height);
-}
+  // Set uniform variables
+  glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &m_camera.m_viewMatrix[0][0]);
+  glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_camera.m_projMatrix[0][0]);
+  glUniform1i(skyTexLoc, 0);
 
-void OpenGLWindow::terminateGL() { 
-  glDeleteProgram(m_program); 
+  float xTranslation = m_maze.m_mazeMatrix.size() / 2 ;
+  float yTranslation = m_maze.m_mazeMatrix[0].size() / 2;
+  float skyboxScale = std::max(m_maze.m_mazeMatrix.size(), m_maze.m_mazeMatrix[0].size()) * 50;
+
+  glm::mat4 modelMatrix{1.0f};
+  modelMatrix = glm::translate(modelMatrix, glm::vec3(xTranslation, 0.0f, yTranslation));
+  modelMatrix = glm::scale(modelMatrix, glm::vec3(skyboxScale, skyboxScale, skyboxScale));
+  glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+
+  m_skyModel.render();
+
+  glUseProgram(0);
 }
 
 void OpenGLWindow::update() {

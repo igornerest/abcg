@@ -48,6 +48,15 @@ void Model::createBuffers() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+void Model::loadCubeTexture(const std::string& path) {
+  if (!std::filesystem::exists(path)) return;
+
+  glDeleteTextures(1, &m_cubeTexture);
+  m_cubeTexture = abcg::opengl::loadCubemap(
+      {path + "posx.png", path + "negx.png", path + "posy.png",
+       path + "negy.png", path + "posz.png", path + "negz.png"});
+}
+
 void Model::loadDiffuseTexture(std::string_view path) {
   if (!std::filesystem::exists(path)) return;
 
@@ -196,6 +205,9 @@ void Model::render() const {
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, m_normalTexture);
 
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeTexture);
+
   // Set minification and magnification parameters
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -204,6 +216,9 @@ void Model::render() const {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+  glFrontFace(GL_CCW);
+  glDepthFunc(GL_LEQUAL);
+  
   glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
 
   glBindVertexArray(0);
