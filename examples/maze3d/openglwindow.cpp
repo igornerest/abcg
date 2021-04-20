@@ -67,6 +67,9 @@ void OpenGLWindow::initializeGL() {
   m_wallModel.loadFromFile(getAssetsPath() + "wall.obj", false);
   m_wallModel.setupVAO(m_program);
 
+  m_flagModel.loadFromFile(getAssetsPath() + "flag.obj", true);
+  m_flagModel.setupVAO(m_program);
+
   // Load cubemap
   m_skyModel.loadFromFile(getAssetsPath() + "skybox.obj", false);
   m_skyModel.loadCubeTexture(getAssetsPath() + "maps/cube/");
@@ -182,6 +185,17 @@ void OpenGLWindow::renderMaze() {
       }
     }
   }
+
+  // Draw flag (end position)
+  glm::mat4 modelMatrix{1.0f};
+  modelMatrix = glm::translate(modelMatrix, glm::vec3(4.0f, 0.0f, 5.0f));
+  glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+
+  auto modelViewMatrix{glm::mat3(m_camera.m_viewMatrix * modelMatrix)};
+  glm::mat3 normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+  glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
+
+  m_flagModel.render();
 
   glUseProgram(0);
 }

@@ -24,8 +24,9 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
   Model m_grassModel;
   Model m_wallModel;
+  Model m_flagModel;
   Model m_skyModel;
-  
+
   Maze m_maze;
 
   Camera m_camera;

@@ -212,10 +212,5 @@ void main() {
     color = BlinnPhong(NTan, LTan, VTan, texCoord, intensity, attenuation);
   }
 
-  if (!gl_FrontFacing) {
-    float i = (color.r + color.g + color.b) / 3.0;
-    color = vec4(i, 0, 0, 1.0);
-  }
-
   outColor = color;
 }
