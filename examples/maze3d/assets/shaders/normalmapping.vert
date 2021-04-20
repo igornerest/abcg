@@ -20,7 +20,7 @@ out vec3 fragNObj;
 out vec3 fragLEye;
 out vec3 fragVEye;
 
-out float fragAttenuation;
+out vec4 fragPosition;
 
 void main() {
   vec3 PEye = (viewMatrix * modelMatrix * vec4(inPosition, 1.0)).xyz;
@@ -36,7 +36,7 @@ void main() {
   fragLEye = LEye;
   fragVEye = -PEye;
 
-  fragAttenuation = 1.0 - (distance(vec3(0, 0, 0), PEye) / 2.5);
+  fragPosition = vec4(modelMatrix * vec4(inPosition, 1.0));
 
   gl_Position = projMatrix * vec4(PEye, 1.0);
 }

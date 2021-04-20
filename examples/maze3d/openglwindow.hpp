@@ -39,10 +39,14 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   // 0: triplanar; 1: cylindrical; 2: spherical; 3: from mesh
   int m_mappingMode{};
 
-  // Light and material properties
+  // Light properties
   glm::vec4 m_Ia{1.0f};
   glm::vec4 m_Id{1.0f};
   glm::vec4 m_Is{1.0f};
+  float m_lightCutOff{0.98f};
+  float m_lightOuterCutOff{0.92f};
+
+  // Material properties
   glm::vec4 m_Ka;
   glm::vec4 m_Kd;
   glm::vec4 m_Ks;

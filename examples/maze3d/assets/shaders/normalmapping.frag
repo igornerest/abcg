@@ -10,12 +10,17 @@ in vec3 fragNObj;
 in vec3 fragLEye;
 in vec3 fragVEye;
 
-in float fragAttenuation;
+in vec4 fragPosition;
+
 
 uniform mat3 normalMatrix;
 
 // Light properties
 uniform vec4 Ia, Id, Is;
+uniform vec4 lightPosWorldSpace;
+uniform vec4 lightDirWorldSpace;
+uniform float lightCutOff;
+uniform float lightOuterCutOff;
 
 // Material properties
 uniform vec4 Ka, Kd, Ks;
@@ -43,7 +48,7 @@ mat3 ComputeTBN(vec3 TObj, vec3 BObj, vec3 NObj) {
 }
 
 // Blinn-Phong reflection model
-vec4 BlinnPhong(vec3 N, vec3 L, vec3 V, vec2 texCoord) {
+vec4 BlinnPhong(vec3 N, vec3 L, vec3 V, vec2 texCoord, float intensity, float attenuation) {
   N = normalize(N);
   L = normalize(L);
 
@@ -62,9 +67,9 @@ vec4 BlinnPhong(vec3 N, vec3 L, vec3 V, vec2 texCoord) {
   vec4 map_Kd = texture(diffuseTex, texCoord);
   vec4 map_Ka = map_Kd;
 
-  vec4 diffuseColor = map_Kd * Kd * Id * lambertian;
-  vec4 specularColor = Ks * Is * specular;
-  vec4 ambientColor = map_Ka * Ka * Ia;
+  vec4 diffuseColor = map_Kd * Kd * Id * lambertian * intensity * attenuation;
+  vec4 specularColor = Ks * Is * specular * intensity * attenuation;
+  vec4 ambientColor = map_Ka * Ka * Ia * attenuation;
 
   return ambientColor + diffuseColor + specularColor;
 }
@@ -135,6 +140,16 @@ mat3 SphericalTBN(vec3 P) {
 void main() {
   vec4 color;
 
+  // Spotlight (soft edges)
+  float theta     = dot(normalize(lightDirWorldSpace), normalize(fragPosition - lightPosWorldSpace));
+  float epsilon   = lightCutOff - lightOuterCutOff;
+  float intensity = clamp((theta - lightOuterCutOff) / epsilon, 0.0, 1.0); 
+
+  // Attenuation
+  float distance    = length(fragPosition - lightPosWorldSpace);
+  float attenuation = 1.0f / (1.0f + 0.09f * distance + 0.032 * (distance * distance));
+  //float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
   if (mappingMode == 0) {
     // Triplanar mapping
 
@@ -148,7 +163,7 @@ void main() {
     vec3 VTan = TBN * normalize(fragVEye);
     vec3 NTan = texture(normalTex, texCoord1).xyz;
     NTan = normalize(NTan * 2.0 - 1.0);  // From [0, 1] to [-1, 1]
-    vec4 color1 = BlinnPhong(NTan, LTan, VTan, texCoord1);
+    vec4 color1 = BlinnPhong(NTan, LTan, VTan, texCoord1, intensity, attenuation);
 
     // Sample with y planar mapping
     vec2 texCoord2 = PlanarMappingYUV(fragPObj + offset);
@@ -157,7 +172,7 @@ void main() {
     VTan = TBN * normalize(fragVEye);
     NTan = texture(normalTex, texCoord2).xyz;
     NTan = normalize(NTan * 2.0 - 1.0);  // From [0, 1] to [-1, 1]
-    vec4 color2 = BlinnPhong(NTan, LTan, VTan, texCoord2);
+    vec4 color2 = BlinnPhong(NTan, LTan, VTan, texCoord2, intensity, attenuation);
 
     // Sample with z planar mapping
     vec2 texCoord3 = PlanarMappingZUV(fragPObj + offset);
@@ -166,7 +181,7 @@ void main() {
     VTan = TBN * normalize(fragVEye);
     NTan = texture(normalTex, texCoord3).xyz;
     NTan = normalize(NTan * 2.0 - 1.0);  // From [0, 1] to [-1, 1]
-    vec4 color3 = BlinnPhong(NTan, LTan, VTan, texCoord3);
+    vec4 color3 = BlinnPhong(NTan, LTan, VTan, texCoord3, intensity, attenuation);
 
     // Compute average based on normal
     vec3 weight = abs(normalize(fragNObj));
@@ -194,7 +209,7 @@ void main() {
     vec3 NTan = texture(normalTex, texCoord).xyz;
     NTan = normalize(NTan * 2.0 - 1.0);  // From [0, 1] to [-1, 1]
 
-    color = BlinnPhong(NTan, LTan, VTan, texCoord);
+    color = BlinnPhong(NTan, LTan, VTan, texCoord, intensity, attenuation);
   }
 
   if (!gl_FrontFacing) {
@@ -202,5 +217,5 @@ void main() {
     color = vec4(i, 0, 0, 1.0);
   }
 
-  outColor = fragAttenuation * color;
+  outColor = color;
 }
