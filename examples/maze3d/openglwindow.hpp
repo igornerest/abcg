@@ -32,10 +32,13 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   Camera m_camera;
   float m_dollySpeed{0.0f};
   float m_truckSpeed{0.0f};
+  float m_moonAngle{0.0f};
 
   bool m_screenFocus{false};
   bool m_isFlashlightOn{true};
+
   abcg::ElapsedTimer m_mouseTimer{};
+  abcg::ElapsedTimer m_moonTimer{};
 
   // Mapping mode
   // 0: triplanar; 1: cylindrical; 2: spherical; 3: from mesh

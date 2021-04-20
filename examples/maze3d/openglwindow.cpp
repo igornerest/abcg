@@ -221,6 +221,8 @@ void OpenGLWindow::renderSkybox() {
   glm::mat4 modelMatrix{1.0f};
   modelMatrix = glm::translate(modelMatrix, glm::vec3(xTranslation, 0.0f, yTranslation));
   modelMatrix = glm::scale(modelMatrix, glm::vec3(skyboxScale, skyboxScale, skyboxScale));
+  modelMatrix = glm::rotate(modelMatrix, glm::radians(-m_moonAngle), glm::vec3(1, 0, 0));
+
   glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
 
   m_skyModel.render();
@@ -229,6 +231,11 @@ void OpenGLWindow::renderSkybox() {
 }
 
 void OpenGLWindow::update() {
+  if (m_moonTimer.elapsed() > 0.10) {
+    m_moonAngle = m_moonAngle > 360 ? 0 : m_moonAngle + 0.1;
+    m_moonTimer.restart();
+  }
+
   float deltaTime{static_cast<float>(getDeltaTime())};
 
   glm::vec2 rotationSpeed = getRotationSpeedFromMouse();
