@@ -1,6 +1,7 @@
 #include "openglwindow.hpp"
 
 #include <imgui.h>
+#include <fmt/core.h>
 
 #include <cppitertools/itertools.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -48,6 +49,11 @@ void OpenGLWindow::handleEvent(SDL_Event& ev) {
 }
 
 void OpenGLWindow::initializeGL() {
+  initializeModels();
+  initializeGameObjects();
+}
+
+void OpenGLWindow::initializeModels() {
   glClearColor(0, 0, 0, 1);
 
   // Enable depth buffering
@@ -83,10 +89,14 @@ void OpenGLWindow::initializeGL() {
   m_Ks = m_wallModel.getKs();
   m_shininess = m_wallModel.getShininess();
   m_mappingMode = 3;  // "From mesh" option
+}
 
+void OpenGLWindow::initializeGameObjects() {
   m_maze.initializeMaze(getAssetsPath() + "levels/level1.txt");
   
   m_camera.initializeCamera(m_maze);
+  
+  initializeSound(getAssetsPath() + "sounds/ambience-sound.wav");
 }
 
 void OpenGLWindow::paintGL() {
@@ -117,14 +127,21 @@ void OpenGLWindow::paintUI() {
   if (m_gameOver) {
     ImGui::Image((void*)(intptr_t)m_finalscreenTexture, ImVec2(m_viewportWidth, m_viewportHeight));
 
+    if (!m_gameOverSound) {
+      initializeSound(getAssetsPath() + "sounds/scary-scream.wav");
+      m_gameOverSound = true;
+    }
+
     if (m_gameOverTimer.elapsed() > 5) {
       m_gameOver = false;
+      m_gameOverSound = false;
       m_gameOverTimer.restart();
-      initializeGL();
+      initializeGameObjects();
     }
   }
   else {
-    ImGui::Text("Find the black flag to exit the maze.");
+    ImGui::Text("Find the black flag to exit the maze!");
+    ImGui::Text("Use headphones for better experience");
     ImGui::Spacing();
     ImGui::Spacing();
     ImGui::Spacing();
@@ -287,6 +304,30 @@ void OpenGLWindow::update() {
   }
 }
 
+// based on https://gigi.nullneuron.net/gigilabs/playing-a-wav-file-using-sdl2/
+void OpenGLWindow::initializeSound(std::string path) {
+  // clean up previous sounds
+  SDL_CloseAudioDevice(m_deviceId);
+  SDL_FreeWAV(m_wavBuffer);
+
+  SDL_AudioSpec wavSpec;
+  Uint32 wavLength;
+
+  if (SDL_LoadWAV(path.c_str(), &wavSpec, &m_wavBuffer, &wavLength) == nullptr) {
+    throw abcg::Exception{abcg::Exception::Runtime(
+        fmt::format("Failed to load sound {} ({})", path, SDL_GetError()))};
+  }
+
+  m_deviceId = SDL_OpenAudioDevice(nullptr, 0, &wavSpec, nullptr, 0);
+
+  if (SDL_QueueAudio(m_deviceId, m_wavBuffer, wavLength) < 0) {
+    throw abcg::Exception{abcg::Exception::Runtime(
+        fmt::format("Failed to play sound {} ({})", path, SDL_GetError()))};
+  }
+
+  SDL_PauseAudioDevice(m_deviceId, 0);
+}
+
 glm::vec2 OpenGLWindow::getRotationSpeedFromMouse() {
   if (!m_screenFocus)
     return glm::vec2{0, 0};
@@ -309,5 +350,4 @@ glm::vec2 OpenGLWindow::getRotationSpeedFromMouse() {
     return glm::vec2{0, 0};
 
   return glm::vec2{movement.x * speedScale, movement.y * speedScale};
-
 }

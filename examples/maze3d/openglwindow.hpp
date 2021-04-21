@@ -38,6 +38,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   bool m_screenFocus{false};
   bool m_isFlashlightOn{true};
   bool m_gameOver{false};
+  bool m_gameOverSound{false};
 
   abcg::ElapsedTimer m_mouseTimer{};
   abcg::ElapsedTimer m_moonTimer{};
@@ -61,9 +62,16 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   glm::vec4 m_Ks;
   float m_shininess{};
 
+  // Audio elements
+  SDL_AudioDeviceID m_deviceId;
+  Uint8 *m_wavBuffer;
+
   void renderMaze();
   void renderSkybox();
   void update();
+  void initializeSound(std::string path);
+  void initializeModels();
+  void initializeGameObjects();
   glm::vec2 getRotationSpeedFromMouse();
 };
 
