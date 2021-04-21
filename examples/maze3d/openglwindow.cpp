@@ -241,7 +241,7 @@ void OpenGLWindow::renderMaze() {
 
   // Draw flag (end position)
   glm::mat4 modelMatrix{1.0f};
-  modelMatrix = glm::translate(modelMatrix, glm::vec3(4.0f, 0.0f, 5.0f));
+  modelMatrix = glm::translate(modelMatrix, m_maze.m_endPosition);
   glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
 
   auto modelViewMatrix{glm::mat3(m_camera.m_viewMatrix * modelMatrix)};

@@ -33,6 +33,8 @@ class Camera {
   glm::mat4 m_viewMatrix;
   // Matrix to change from camera space to clip space
   glm::mat4 m_projMatrix;
+
+  float m_maxDepth{};
 };
 
 #endif

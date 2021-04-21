@@ -148,7 +148,6 @@ void main() {
   // Attenuation
   float distance    = length(fragPosition - lightPosWorldSpace);
   float attenuation = 1.0f / (1.0f + 0.09f * distance + 0.032 * (distance * distance));
-  //float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
   if (mappingMode == 0) {
     // Triplanar mapping
