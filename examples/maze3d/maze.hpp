@@ -11,6 +11,7 @@ class Maze {
  public:
   void initializeMaze(std::string path);
   bool canMove(glm::vec3 position);
+  bool hasFinished(glm::vec3 position);
   bool isBox(int xpos, int ypos);
 
  private:

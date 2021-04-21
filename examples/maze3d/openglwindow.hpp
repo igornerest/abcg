@@ -18,6 +18,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
  private: 
   GLuint m_program{};
   GLuint m_skyProgram{};
+  GLuint m_finalscreenTexture{};
 
   int m_viewportWidth{};
   int m_viewportHeight{};
@@ -36,9 +37,11 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
   bool m_screenFocus{false};
   bool m_isFlashlightOn{true};
+  bool m_gameOver{false};
 
   abcg::ElapsedTimer m_mouseTimer{};
   abcg::ElapsedTimer m_moonTimer{};
+  abcg::ElapsedTimer m_gameOverTimer{};
 
   // Mapping mode
   // 0: triplanar; 1: cylindrical; 2: spherical; 3: from mesh

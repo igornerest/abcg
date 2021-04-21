@@ -60,6 +60,8 @@ void OpenGLWindow::initializeGL() {
   m_skyProgram = createProgramFromFile(getAssetsPath() + "shaders/skybox.vert",
                                        getAssetsPath() + "shaders/skybox.frag");
 
+  m_finalscreenTexture = abcg::opengl::loadTexture(getAssetsPath() + "/maps/finalscreen.jpg");
+
   // Load models
   m_grassModel.loadFromFile(getAssetsPath() + "grass.obj", false);
   m_grassModel.setupVAO(m_program);
@@ -88,6 +90,9 @@ void OpenGLWindow::initializeGL() {
 }
 
 void OpenGLWindow::paintGL() {
+  if (m_gameOver)
+    return;
+
   update();
 
   // Clear color buffer and depth buffer
@@ -99,8 +104,39 @@ void OpenGLWindow::paintGL() {
   renderSkybox();
 }
 
-void OpenGLWindow::paintUI() { 
-  abcg::OpenGLWindow::paintUI(); 
+void OpenGLWindow::paintUI() {
+  ImGui::SetNextWindowPos(ImVec2{0, 0});
+  ImGui::SetNextWindowSize(ImVec2{m_viewportWidth, m_viewportHeight});
+  ImGuiWindowFlags flags{ImGuiWindowFlags_NoBackground |
+                          ImGuiWindowFlags_NoTitleBar |
+                          ImGuiWindowFlags_NoInputs |
+                          ImGuiWindowFlags_NoScrollbar};
+
+  ImGui::Begin("OpenGL Texture Text", nullptr, flags);
+
+  if (m_gameOver) {
+    ImGui::Image((void*)(intptr_t)m_finalscreenTexture, ImVec2(m_viewportWidth, m_viewportHeight));
+
+    if (m_gameOverTimer.elapsed() > 5) {
+      m_gameOver = false;
+      m_gameOverTimer.restart();
+      initializeGL();
+    }
+  }
+  else {
+    ImGui::Text("Find the black flag to exit the maze.");
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Text("Click anywhere to start moving the camera");
+    ImGui::Text("Press ESC to lose screen focus");
+    ImGui::Text("Press WASD to move");
+    ImGui::Text("Press F to turn on/off the flashlight");
+
+    m_gameOverTimer.restart();
+  }
+
+  ImGui::End();
 }
 
 void OpenGLWindow::resizeGL(int width, int height) {
@@ -245,6 +281,10 @@ void OpenGLWindow::update() {
   m_camera.truck(m_truckSpeed * deltaTime);
   m_camera.pan(rotationSpeed.x * deltaTime);
   m_camera.tilt(rotationSpeed.y * deltaTime);
+
+  if (m_maze.hasFinished(m_camera.m_eye)) {
+    m_gameOver = true;
+  }
 }
 
 glm::vec2 OpenGLWindow::getRotationSpeedFromMouse() {

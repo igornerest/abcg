@@ -45,6 +45,13 @@ bool Maze::canMove(glm::vec3 pos) {
   return true;
 }
 
+bool Maze::hasFinished(glm::vec3 pos) {
+  int xPos = static_cast<int>(pos[0]);
+  int yPos = static_cast<int>(pos[2]);
+
+  return glm::vec3{xPos, 0, yPos} == m_endPosition;
+}
+
 bool Maze::isBox(int xPos, int yPos) {
   return m_mazeMatrix[xPos][yPos] == 'x';
 }
