@@ -60,20 +60,20 @@ void OpenGLWindow::initializeGL() {
   m_skyProgram = createProgramFromFile(getAssetsPath() + "shaders/skybox.vert",
                                        getAssetsPath() + "shaders/skybox.frag");
 
-  m_finalscreenTexture = abcg::opengl::loadTexture(getAssetsPath() + "/maps/finalscreen.jpg");
+  m_finalscreenTexture = abcg::opengl::loadTexture(getAssetsPath() + "maps/finalscreen.jpg");
 
   // Load models
-  m_grassModel.loadFromFile(getAssetsPath() + "grass.obj", false);
+  m_grassModel.loadFromFile(getAssetsPath() + "models/grass.obj", false);
   m_grassModel.setupVAO(m_program);
 
-  m_wallModel.loadFromFile(getAssetsPath() + "wall.obj", false);
+  m_wallModel.loadFromFile(getAssetsPath() + "models/wall.obj", false);
   m_wallModel.setupVAO(m_program);
 
-  m_flagModel.loadFromFile(getAssetsPath() + "flag.obj", true);
+  m_flagModel.loadFromFile(getAssetsPath() + "models/flag.obj", true);
   m_flagModel.setupVAO(m_program);
 
   // Load cubemap
-  m_skyModel.loadFromFile(getAssetsPath() + "skybox.obj", false);
+  m_skyModel.loadFromFile(getAssetsPath() + "models/skybox.obj", false);
   m_skyModel.loadCubeTexture(getAssetsPath() + "maps/cube/");
   m_skyModel.setupVAO(m_skyProgram);
 
@@ -106,7 +106,7 @@ void OpenGLWindow::paintGL() {
 
 void OpenGLWindow::paintUI() {
   ImGui::SetNextWindowPos(ImVec2{0, 0});
-  ImGui::SetNextWindowSize(ImVec2{m_viewportWidth, m_viewportHeight});
+  ImGui::SetNextWindowSize(ImVec2{(float)m_viewportWidth, (float)m_viewportHeight});
   ImGuiWindowFlags flags{ImGuiWindowFlags_NoBackground |
                           ImGuiWindowFlags_NoTitleBar |
                           ImGuiWindowFlags_NoInputs |
