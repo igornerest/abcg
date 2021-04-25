@@ -12,14 +12,14 @@ Igor Neres Trindade - 11030416
 
 ## CG Applications
 
-### [Flappy ~~Bird~~ Pacman](https://igornerest.github.io/abcg/public/flappybird/index.html)
+### [Flappy ~~Bird~~ Pacman](https://igornerest.github.io/abcg/public/flappybird)
 Tap the screen to make your bird fly. If you hit a pipe, your bird falls and you restart the game. The further you go, the higher your score will become (but the game also gets harder).
 
 <p align="center">
   <img src="flappy-pacman.gif" alt="animated" />
 </p>
 
-### [Haunted Maze 3D](https://igornerest.github.io/abcg/public/maze3d/index.html)
+### [Haunted Maze 3D](https://igornerest.github.io/abcg/public/maze3d)
 You woke up alone in a haunted maze. It is dark outside... strange noises everywhere. Are you afraid? Don't be. Find the black flag to escape (and have a little surprise muahahaha)
 
 Controls:
