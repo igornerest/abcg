@@ -257,7 +257,7 @@ void OpenGLWindow::renderSkybox() {
   glUseProgram(m_skyProgram);
 
   // Get location of uniform variables
-  GLint modelMatrixLoc{glGetUniformLocation(m_program, "modelMatrix")};
+  GLint modelMatrixLoc{glGetUniformLocation(m_skyProgram, "modelMatrix")};
   GLint viewMatrixLoc{glGetUniformLocation(m_skyProgram, "viewMatrix")};
   GLint projMatrixLoc{glGetUniformLocation(m_skyProgram, "projMatrix")};
   GLint skyTexLoc{glGetUniformLocation(m_skyProgram, "skyTex")};
@@ -265,7 +265,7 @@ void OpenGLWindow::renderSkybox() {
   // Set uniform variables
   glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &m_camera.m_viewMatrix[0][0]);
   glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_camera.m_projMatrix[0][0]);
-  glUniform1i(skyTexLoc, 0);
+  glUniform1i(skyTexLoc, 2);
 
   float xTranslation = m_maze.m_mazeMatrix.size() / 2 ;
   float yTranslation = m_maze.m_mazeMatrix[0].size() / 2;

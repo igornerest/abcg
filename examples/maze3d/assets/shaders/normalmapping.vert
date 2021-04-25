@@ -9,7 +9,7 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
-uniform vec4 lightPosWorldSpace;
+uniform mediump vec4 lightPosWorldSpace;
 
 out vec2 fragTexCoord;
 out vec3 fragPObj;
