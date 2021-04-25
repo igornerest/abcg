@@ -19,7 +19,7 @@ Tap the screen to make your bird fly. If you hit a pipe, your bird falls and you
   <img src="flappy-pacman.gif" alt="animated" />
 </p>
 
-### Haunted Maze 3D
+### [Haunted Maze 3D](https://igornerest.github.io/abcg/public/maze3d/index.html)
 You woke up alone in a haunted maze. It is dark outside... strange noises everywhere. Are you afraid? Don't be. Find the black flag to escape (and have a little surprise muahahaha)
 
 Controls:
